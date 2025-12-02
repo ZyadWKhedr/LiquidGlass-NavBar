@@ -10,20 +10,11 @@ class NavbarPage extends ConsumerWidget {
   NavbarPage({super.key});
 
   final List<Widget> _pages = [HomePage(), SearchPage(), ProfilePage()];
-  final PageController _pageController = PageController(initialPage: 0);
-
-  void _onNavTapped(WidgetRef ref, int index) {
-    _pageController.animateToPage(
-      index,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-    ref.read(navbarStateProvider.notifier).setCurrentIndex(index);
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navbarState = ref.watch(navbarStateProvider);
+    final notifier = ref.read(navbarStateProvider.notifier);
     final currentIndex = navbarState.currentIndex;
     final dragOffset = navbarState.dragOffset;
 
@@ -34,10 +25,11 @@ class NavbarPage extends ConsumerWidget {
           Transform.translate(
             offset: Offset(dragOffset * 0.4, 0),
             child: PageView(
-              controller: _pageController,
+              controller: notifier.pageController,
               physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (i) =>
-                  ref.read(navbarStateProvider.notifier).setCurrentIndex(i),
+              onPageChanged: (i) {
+                notifier.setCurrentIndex(i);
+              },
               children: _pages,
             ),
           ),
@@ -54,19 +46,17 @@ class NavbarPage extends ConsumerWidget {
                 // DRAG UPDATE
                 onHorizontalDragUpdate: (details) {
                   final newOffset = dragOffset + details.delta.dx;
-                  ref
-                      .read(navbarStateProvider.notifier)
-                      .setDragOffset(newOffset);
+                  notifier.setDragOffset(newOffset);
                 },
 
                 // DRAG END
                 onHorizontalDragEnd: (_) {
                   if (dragOffset < -80 && currentIndex < _pages.length - 1) {
-                    _onNavTapped(ref, currentIndex + 1);
+                    notifier.setCurrentIndex(currentIndex + 1);
                   } else if (dragOffset > 80 && currentIndex > 0) {
-                    _onNavTapped(ref, currentIndex - 1);
+                    notifier.setCurrentIndex(currentIndex - 1);
                   }
-                  ref.read(navbarStateProvider.notifier).resetDragOffset();
+                  notifier.resetDragOffset();
                 },
 
                 child: NavbarWidget(
@@ -76,8 +66,6 @@ class NavbarPage extends ConsumerWidget {
                     Icons.person_rounded,
                   ],
                   labels: ['Home', 'Search', 'Profile'],
-                  currentIndex: currentIndex,
-                  onTap: (index) => _onNavTapped(ref, index),
                 ),
               ),
             ),

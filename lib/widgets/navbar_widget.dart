@@ -1,33 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'navbar_item_widget.dart';
 import 'navbar_draggable_indicator.dart';
 import 'navbar_background.dart';
+import '../providers/navbar_providers.dart';
 
-class NavbarWidget extends StatefulWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+class NavbarWidget extends ConsumerWidget {
   final List<IconData> icons;
   final List<String> labels;
 
-  const NavbarWidget({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-    required this.icons,
-    required this.labels,
-  });
+  const NavbarWidget({super.key, required this.icons, required this.labels});
 
   @override
-  State<NavbarWidget> createState() => _NavbarWidgetState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final navbarState = ref.watch(navbarStateProvider);
+    final currentIndex = navbarState.currentIndex;
+    final dragOffset = navbarState.draggablePosition;
 
-class _NavbarWidgetState extends State<NavbarWidget> {
-  double _draggableX = 0; // draggable position
-  final double _draggableSize = 50 * 1.5;
-
-  @override
-  Widget build(BuildContext context) {
     return LiquidGlassLayer(
       useBackdropGroup: true,
       settings: const LiquidGlassSettings(thickness: 20, blur: 1),
@@ -35,10 +25,7 @@ class _NavbarWidgetState extends State<NavbarWidget> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final rowWidth = constraints.maxWidth;
-            final itemCount = widget.icons.length;
-
-            // Compute center positions dynamically
-            // Account for the navbar's horizontal margin (20px on each side)
+            final itemCount = icons.length;
             final navbarMargin = 20.0;
             final availableWidth = rowWidth - (navbarMargin * 2);
             final itemWidth = availableWidth / itemCount;
@@ -49,12 +36,16 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                   navbarMargin +
                   (i * itemWidth) +
                   (itemWidth / 2) -
-                  (_draggableSize * 1.2 / 2),
+                  (50 * 1.5 * 1.2 / 2),
             );
 
-            // Make sure _draggableX is initialized at the selected index
-            if (_draggableX == 0 && positions.isNotEmpty) {
-              _draggableX = positions[widget.currentIndex];
+            // Initialize draggable position if not set
+            if (dragOffset == 0 && positions.isNotEmpty) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ref
+                    .read(navbarStateProvider.notifier)
+                    .setDraggablePosition(positions[currentIndex]);
+              });
             }
 
             return Stack(
@@ -67,16 +58,19 @@ class _NavbarWidgetState extends State<NavbarWidget> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: List.generate(itemCount, (index) {
-                      final isSelected = widget.currentIndex == index;
+                      final isSelected = currentIndex == index;
                       return NavbarItemWidget(
-                        icon: widget.icons[index],
-                        label: widget.labels[index],
+                        icon: icons[index],
+                        label: labels[index],
                         isSelected: isSelected,
                         onTap: () {
-                          setState(() {
-                            _draggableX = positions[index];
-                          });
-                          widget.onTap(index);
+                          // Update provider state
+                          ref
+                              .read(navbarStateProvider.notifier)
+                              .setCurrentIndex(index);
+                          ref
+                              .read(navbarStateProvider.notifier)
+                              .setDraggablePosition(positions[index]);
                         },
                       );
                     }),
@@ -85,19 +79,21 @@ class _NavbarWidgetState extends State<NavbarWidget> {
 
                 // Draggable indicator
                 NavbarDraggableIndicator(
-                  position: _draggableX,
-                  size: _draggableSize,
+                  position: dragOffset,
+                  size: 50 * 1.5,
                   snapPositions: positions,
                   onDragUpdate: (newPosition) {
-                    setState(() {
-                      _draggableX = newPosition;
-                    });
+                    ref
+                        .read(navbarStateProvider.notifier)
+                        .setDraggablePosition(newPosition);
                   },
                   onDragEnd: (newIndex) {
-                    setState(() {
-                      _draggableX = positions[newIndex];
-                    });
-                    widget.onTap(newIndex);
+                    ref
+                        .read(navbarStateProvider.notifier)
+                        .setCurrentIndex(newIndex);
+                    ref
+                        .read(navbarStateProvider.notifier)
+                        .setDraggablePosition(positions[newIndex]);
                   },
                 ),
               ],

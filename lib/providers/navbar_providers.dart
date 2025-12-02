@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 /// Provider for the current selected navbar index
@@ -10,6 +11,7 @@ final draggablePositionProvider = StateProvider<double>((ref) => 0.0);
 final dragOffsetProvider = StateProvider<double>((ref) => 0.0);
 
 /// Navbar state class to hold all navbar-related state
+
 class NavbarState {
   final int currentIndex;
   final double draggablePosition;
@@ -34,35 +36,41 @@ class NavbarState {
   }
 }
 
-/// StateNotifier for managing navbar state
 class NavbarStateNotifier extends StateNotifier<NavbarState> {
   NavbarStateNotifier()
     : super(
         NavbarState(currentIndex: 0, draggablePosition: 0.0, dragOffset: 0.0),
-      );
+      ) {
+    pageController = PageController(initialPage: 0);
+  }
 
-  /// Update the current index
+  late final PageController pageController;
+
+  /// Change page and update index
   void setCurrentIndex(int index) {
+    pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
     state = state.copyWith(currentIndex: index);
   }
 
-  /// Update the draggable position
+  /// Update draggable position
   void setDraggablePosition(double position) {
     state = state.copyWith(draggablePosition: position);
   }
 
-  /// Update the drag offset
+  /// Update drag offset
   void setDragOffset(double offset) {
     state = state.copyWith(dragOffset: offset);
   }
 
-  /// Reset drag offset to zero
   void resetDragOffset() {
     state = state.copyWith(dragOffset: 0.0);
   }
 }
 
-/// Provider for the navbar state notifier
 final navbarStateProvider =
     StateNotifierProvider<NavbarStateNotifier, NavbarState>((ref) {
       return NavbarStateNotifier();
