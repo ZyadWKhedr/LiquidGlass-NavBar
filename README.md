@@ -3,6 +3,10 @@
 A Flutter application demonstrating a **glass‑morphic bottom navigation bar** with smooth drag interactions, animated draggable indicator, and **Riverpod** state management.
 
 ## Features
+
+https://github.com/user-attachments/assets/70b9125a-58b3-4459-8dda-fed93351e915
+
+
 - **Liquid Glass UI** using `liquid_glass_renderer` for a frosted‑glass effect.
 - **Custom Navbar** split into reusable widgets:
   - `NavbarBackground` – glass‑styled container.
