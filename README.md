@@ -4,7 +4,11 @@ A Flutter application demonstrating a **glass‑morphic bottom navigation bar** 
 
 ## Features
 
-https://github.com/user-attachments/assets/70b9125a-58b3-4459-8dda-fed93351e915
+
+
+https://github.com/user-attachments/assets/c083a53d-5b9f-4355-9b77-4a04e70198d3
+
+
 
 
 - **Liquid Glass UI** using `liquid_glass_renderer` for a frosted‑glass effect.
