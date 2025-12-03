@@ -52,33 +52,39 @@ class NavbarWidget extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               children: [
                 // Navbar background with items
-                NavbarBackground(
-                  width: rowWidth,
-                  height: 70,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(itemCount, (index) {
-                      final isSelected = currentIndex == index;
-                      return NavbarItemWidget(
-                        icon: icons[index],
-                        label: labels[index],
-                        isSelected: isSelected,
-                        onTap: () {
-                          // Update provider state
-                          ref
-                              .read(navbarStateProvider.notifier)
-                              .setCurrentIndex(index);
-                          ref
-                              .read(navbarStateProvider.notifier)
-                              .setDraggablePosition(positions[index]);
-                        },
-                      );
-                    }),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ).copyWith(bottom: 30),
+                  child: NavbarBackground(
+                    width: rowWidth,
+                    height: 70,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: List.generate(itemCount, (index) {
+                        final isSelected = currentIndex == index;
+                        return NavbarItemWidget(
+                          icon: icons[index],
+                          label: labels[index],
+                          isSelected: isSelected,
+                          onTap: () {
+                            // Update provider state
+                            ref
+                                .read(navbarStateProvider.notifier)
+                                .setCurrentIndex(index);
+                            ref
+                                .read(navbarStateProvider.notifier)
+                                .setDraggablePosition(positions[index]);
+                          },
+                        );
+                      }),
+                    ),
                   ),
                 ),
 
                 // Draggable indicator
                 NavbarDraggableIndicator(
+                  index: ref.read(navbarStateProvider).currentIndex,
                   position: dragOffset,
                   size: 50 * 1.5,
                   snapPositions: positions,

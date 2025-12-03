@@ -23,7 +23,8 @@ class NavbarPage extends ConsumerWidget {
         children: [
           // PAGE VIEW
           Transform.translate(
-            offset: Offset(dragOffset * 0.4, 0),
+            offset: Offset(dragOffset * 0.25, 0),
+
             child: PageView(
               controller: notifier.pageController,
               physics: const NeverScrollableScrollPhysics(),
@@ -45,7 +46,7 @@ class NavbarPage extends ConsumerWidget {
 
                 // DRAG UPDATE
                 onHorizontalDragUpdate: (details) {
-                  final newOffset = dragOffset + details.delta.dx;
+                  final newOffset = dragOffset + details.delta.dx * 0.3;
                   notifier.setDragOffset(newOffset);
                 },
 

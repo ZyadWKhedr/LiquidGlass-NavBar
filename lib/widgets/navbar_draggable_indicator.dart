@@ -21,6 +21,8 @@ class NavbarDraggableIndicator extends StatelessWidget {
   /// Callback when the drag ends
   final Function(int) onDragEnd;
 
+  final int index;
+
   const NavbarDraggableIndicator({
     super.key,
     required this.position,
@@ -28,12 +30,20 @@ class NavbarDraggableIndicator extends StatelessWidget {
     required this.snapPositions,
     required this.onDragUpdate,
     required this.onDragEnd,
+    required this.index,
   });
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: position,
+      left: index == 0
+          ? position + 16
+          : index == 1
+          ? position - 3
+          : index == 2
+          ? position - 16
+          : position,
+      bottom: 35,
       child: GestureDetector(
         onHorizontalDragUpdate: (details) {
           double newPosition = position + details.delta.dx;
@@ -74,8 +84,8 @@ class NavbarDraggableIndicator extends StatelessWidget {
               shape: LiquidRoundedSuperellipse(borderRadius: 30),
               child: GlassGlow(
                 child: Container(
-                  width: size * 1.1,
-                  height: 55,
+                  width: size * 1.2,
+                  height: 60,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(size / 2),
                   ),
