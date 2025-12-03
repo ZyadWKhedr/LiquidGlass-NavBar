@@ -28,9 +28,6 @@ class NavbarPage extends ConsumerWidget {
             child: PageView(
               controller: notifier.pageController,
               physics: const NeverScrollableScrollPhysics(),
-              onPageChanged: (i) {
-                notifier.setCurrentIndex(i);
-              },
               children: _pages,
             ),
           ),
@@ -52,10 +49,15 @@ class NavbarPage extends ConsumerWidget {
 
                 // DRAG END
                 onHorizontalDragEnd: (_) {
-                  if (dragOffset < -80 && currentIndex < _pages.length - 1) {
-                    notifier.setCurrentIndex(currentIndex + 1);
-                  } else if (dragOffset > 80 && currentIndex > 0) {
-                    notifier.setCurrentIndex(currentIndex - 1);
+                  if (dragOffset.abs() > 80) {
+                    final jump = -(dragOffset / 80).round();
+                    final newIndex = (currentIndex + jump).clamp(
+                      0,
+                      _pages.length - 1,
+                    );
+                    if (newIndex != currentIndex) {
+                      notifier.setCurrentIndex(newIndex);
+                    }
                   }
                   notifier.resetDragOffset();
                 },
