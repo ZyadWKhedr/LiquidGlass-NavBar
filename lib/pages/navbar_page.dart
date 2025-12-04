@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_test/pages/home_page.dart';
-import 'package:liquid_glass_test/pages/search_page.dart';
-import 'package:liquid_glass_test/pages/profile_page.dart';
-import 'package:liquid_glass_test/widgets/navbar_widget.dart';
-import 'package:liquid_glass_test/providers/navbar_providers.dart';
+import 'package:liquid_glass_navbar/liquid_glass_navbar.dart';
+import 'home_page.dart';
+import 'search_page.dart';
+import 'profile_page.dart';
 
 class NavbarPage extends ConsumerWidget {
   const NavbarPage({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:liquid_glass_test/pages/navbar_page.dart';
+import 'pages/navbar_page.dart';
 
 void main() {
   runApp(
