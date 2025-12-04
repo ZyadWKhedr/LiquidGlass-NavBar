@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 /// A glassmorphic background container for the navbar.
@@ -29,10 +30,12 @@ class NavbarBackground extends StatelessWidget {
       child: LiquidGlass(
         shape: LiquidRoundedSuperellipse(borderRadius: 30),
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
+          margin: EdgeInsets.symmetric(horizontal: 20.w), // adaptive margin
+          width: width.w, // adaptive width
+          height: height.h, // adaptive height
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(35.r), // adaptive radius
+          ),
           child: child,
         ),
       ),

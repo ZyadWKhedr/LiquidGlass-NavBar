@@ -9,19 +9,31 @@ import 'package:liquid_glass_test/providers/navbar_providers.dart';
 class NavbarPage extends ConsumerWidget {
   const NavbarPage({super.key});
 
-  final List<Widget> _pages = const [HomePage(), SearchPage(), ProfilePage()];
+  static const List<Widget> _pages = [
+    HomePage(),
+    SearchPage(),
+    ProfilePage(),
+    SizedBox(),
+    SizedBox(),
+    SizedBox(),
+    // SizedBox(),
+    // SizedBox(),
+    // SizedBox(),
+    // SizedBox(),
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navbarState = ref.watch(navbarStateProvider);
+    final state = ref.watch(navbarStateProvider);
     final notifier = ref.read(navbarStateProvider.notifier);
-    final currentIndex = navbarState.currentIndex;
-    final dragOffset = navbarState.dragOffset;
+
+    final currentIndex = state.currentIndex;
+    final dragOffset = state.dragOffset;
 
     return Scaffold(
       body: Stack(
         children: [
-          // PAGE VIEW
+          // PAGE VIEW WITH PARALLAX SHIFT
           Transform.translate(
             offset: Offset(dragOffset * 0.25, 0),
             child: PageView(
@@ -38,18 +50,19 @@ class NavbarPage extends ConsumerWidget {
             right: 0,
             child: Center(
               child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
+                behavior: HitTestBehavior.translucent,
 
-                // DRAG UPDATE
+                // HORIZONTAL DRAG UPDATE
                 onHorizontalDragUpdate: (details) {
                   notifier.setDragOffset(dragOffset + details.delta.dx * 0.3);
                 },
 
-                // DRAG END
+                // HORIZONTAL DRAG END
                 onHorizontalDragEnd: (_) {
-                  if (dragOffset.abs() > 80) {
-                    // Determine swipe direction and jump pages
-                    final jump = -(dragOffset / 80).round();
+                  const threshold = 80;
+
+                  if (dragOffset.abs() > threshold) {
+                    final jump = -(dragOffset / threshold).round();
                     final newIndex = (currentIndex + jump).clamp(
                       0,
                       _pages.length - 1,
@@ -59,16 +72,36 @@ class NavbarPage extends ConsumerWidget {
                       notifier.setCurrentIndex(newIndex);
                     }
                   }
+
                   notifier.resetDragOffset();
                 },
 
-                child: NavbarWidget(
-                  icons: const [
+                child: const NavbarWidget(
+                  navbarHeight: 70,
+                  bottomPadding: 30,
+
+                  icons: [
                     Icons.home_rounded,
                     Icons.search_rounded,
                     Icons.person_rounded,
+                    Icons.settings_rounded,
+                    Icons.notifications_rounded,
+                    Icons.favorite_rounded,
+                    Icons.shopping_cart_rounded,
+                    Icons.menu_rounded,
+                    Icons.logout_rounded,
                   ],
-                  labels: const ['Home', 'Search', 'Profile'],
+                  labels: [
+                    'Home',
+                    'Search',
+                    'Profile',
+                    'Settings',
+                    'Notifications',
+                    'Favorites',
+                    'Shopping Cart',
+                    'Menu',
+                    'Logout',
+                  ],
                 ),
               ),
             ),

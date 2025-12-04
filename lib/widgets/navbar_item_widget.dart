@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NavbarItemWidget extends StatelessWidget {
   final IconData icon;
@@ -6,15 +7,15 @@ class NavbarItemWidget extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  /// Optional customization
   final double selectedIconSize;
   final double unselectedIconSize;
   final double selectedFontSize;
   final double unselectedFontSize;
   final Color selectedColor;
   final Color unselectedColor;
+
+  /// Removed fixed margin to avoid overflow!
   final EdgeInsetsGeometry padding;
-  final EdgeInsetsGeometry margin;
 
   const NavbarItemWidget({
     super.key,
@@ -28,8 +29,7 @@ class NavbarItemWidget extends StatelessWidget {
     this.unselectedFontSize = 10,
     this.selectedColor = Colors.amber,
     this.unselectedColor = Colors.grey,
-    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-    this.margin = const EdgeInsets.symmetric(horizontal: 30),
+    this.padding = const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
   });
 
   @override
@@ -38,7 +38,6 @@ class NavbarItemWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: padding,
-        margin: margin,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,15 +45,22 @@ class NavbarItemWidget extends StatelessWidget {
             Icon(
               icon,
               color: isSelected ? selectedColor : unselectedColor,
-              size: isSelected ? selectedIconSize : unselectedIconSize,
+              size: (isSelected ? selectedIconSize : unselectedIconSize).sp,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? selectedColor : unselectedColor,
-                fontSize: isSelected ? selectedFontSize : unselectedFontSize,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            SizedBox(height: 3.h),
+            FittedBox(
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? selectedColor : unselectedColor,
+                  fontSize: isSelected
+                      ? selectedFontSize.sp
+                      : unselectedFontSize.sp,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ],

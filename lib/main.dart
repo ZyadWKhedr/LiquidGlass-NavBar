@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:liquid_glass_test/pages/navbar_page.dart';
 
 void main() {
-  runApp(const ProviderScope(child: MyApp()));
+  runApp(
+    ScreenUtilInit(
+      designSize: const Size(426.67, 952),
+      builder: (context, child) => const ProviderScope(child: MyApp()),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

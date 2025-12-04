@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'navbar_item_widget.dart';
 import 'navbar_draggable_indicator.dart';
 import 'navbar_background.dart';
@@ -8,24 +9,17 @@ import '../providers/navbar_providers.dart';
 class NavbarWidget extends ConsumerWidget {
   final List<IconData> icons;
   final List<String> labels;
-
-  final double indicatorSize;
+  final double indicatorWidth;
   final double navbarHeight;
   final double bottomPadding;
-  final double horizontalPadding;
-  final double dragMultiplier;
-  final double snapThreshold;
 
   const NavbarWidget({
     super.key,
     required this.icons,
     required this.labels,
-    this.indicatorSize = 75,
+    this.indicatorWidth = 70,
     this.navbarHeight = 70,
-    this.bottomPadding = 30,
-    this.horizontalPadding = 20,
-    this.dragMultiplier = 0.3,
-    this.snapThreshold = 80,
+    this.bottomPadding = 20,
   });
 
   @override
@@ -33,60 +27,70 @@ class NavbarWidget extends ConsumerWidget {
     final navbarState = ref.watch(navbarStateProvider);
     final notifier = ref.read(navbarStateProvider.notifier);
 
-    // Initialize positions once
+    final screenWidth = 1.sw;
+    final itemCount = icons.length;
+
+    // Create keys to measure each icon
+    final List<GlobalKey> iconKeys = List.generate(
+      itemCount,
+      (_) => GlobalKey(),
+    );
+
+    // After first frame, measure exact center of each icon
     if (navbarState.positions.isEmpty && icons.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final containerWidth = MediaQuery.of(context).size.width;
-        notifier.initPositions(
-          itemCount: icons.length,
-          containerWidth: containerWidth,
-          horizontalPadding: horizontalPadding,
-          indicatorSize: indicatorSize,
-        );
+        // Set measured positions in notifier
+        notifier.initMeasuredPositions(iconKeys);
       });
     }
 
-    final currentIndex = navbarState.currentIndex;
-    final dragOffset = navbarState.draggablePosition;
     final positions = navbarState.positions;
+    final dragCenter = navbarState.draggablePosition;
+    final currentIndex = navbarState.currentIndex;
 
-    return Stack(
-      alignment: Alignment.centerLeft,
-      children: [
-        // Background
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: horizontalPadding,
-          ).copyWith(bottom: bottomPadding),
-          child: NavbarBackground(
-            width: MediaQuery.of(context).size.width,
-            height: navbarHeight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: List.generate(icons.length, (index) {
-                final isSelected = currentIndex == index;
-                return NavbarItemWidget(
-                  icon: icons[index],
-                  label: labels[index],
-                  isSelected: isSelected,
-                  onTap: () => notifier.setCurrentIndex(index),
-                );
-              }),
+    return SizedBox(
+      width: screenWidth,
+      height: navbarHeight.h + bottomPadding.h,
+      child: Stack(
+        alignment: Alignment.bottomLeft,
+        children: [
+          // Background
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: bottomPadding.h,
+            child: NavbarBackground(
+              width: screenWidth,
+              height: navbarHeight.h,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(itemCount, (i) {
+                  return NavbarItemWidget(
+                    key: iconKeys[i],
+                    icon: icons[i],
+                    label: labels[i],
+                    isSelected: i == currentIndex,
+                    onTap: () => notifier.setCurrentIndex(i),
+                    padding: EdgeInsets.symmetric(vertical: 6.h),
+                  );
+                }),
+              ),
             ),
           ),
-        ),
 
-        // Draggable indicator
-        if (positions.isNotEmpty)
-          NavbarDraggableIndicator(
-            index: currentIndex,
-            position: dragOffset,
-            size: indicatorSize,
-            snapPositions: positions,
-            onDragUpdate: notifier.setDraggablePosition,
-            onDragEnd: notifier.setCurrentIndex,
-          ),
-      ],
+          // Draggable indicator
+          if (positions.isNotEmpty)
+            NavbarDraggableIndicator(
+              position: dragCenter,
+              baseSize: indicatorWidth,
+              itemCount: itemCount,
+              snapPositions: positions,
+              onDragUpdate: notifier.setDraggablePosition,
+              onDragEnd: notifier.setCurrentIndex,
+              bottomOffset: bottomPadding.h,
+            ),
+        ],
+      ),
     );
   }
 }

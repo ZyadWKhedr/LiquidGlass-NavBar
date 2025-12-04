@@ -5,7 +5,7 @@ class NavbarState {
   final int currentIndex;
   final double draggablePosition;
   final double dragOffset;
-  final List<double> positions; // Pre-calculated positions
+  final List<double> positions; // Centers of icons
 
   NavbarState({
     required this.currentIndex,
@@ -44,23 +44,12 @@ class NavbarStateNotifier extends StateNotifier<NavbarState> {
 
   late final PageController pageController;
 
-  /// Initialize positions based on container width and number of items
-  void initPositions({
-    required int itemCount,
-    required double containerWidth,
-    double horizontalPadding = 20,
-    double indicatorSize = 75,
-  }) {
-    final availableWidth = containerWidth - horizontalPadding * 2;
-    final itemWidth = availableWidth / itemCount;
-
+  /// Initialize positions evenly (existing method)
+  void initPositions({required int itemCount, required double containerWidth}) {
+    final itemWidth = containerWidth / itemCount;
     final positions = List.generate(
       itemCount,
-      (i) =>
-          horizontalPadding +
-          (i * itemWidth) +
-          (itemWidth / 2) -
-          (indicatorSize * 1.2 / 2),
+      (i) => itemWidth * i + itemWidth / 2,
     );
 
     state = state.copyWith(
@@ -69,38 +58,55 @@ class NavbarStateNotifier extends StateNotifier<NavbarState> {
     );
   }
 
-  /// Change page and update index
+  /// Initialize positions using actual icon sizes (GlobalKey)
+  void initMeasuredPositions(List<GlobalKey> iconKeys) {
+    final positions = iconKeys.map((key) {
+      final box = key.currentContext?.findRenderObject() as RenderBox?;
+      if (box != null) {
+        // center of the icon in global coordinates
+        final center = box.localToGlobal(Offset.zero).dx + box.size.width / 2;
+        return center;
+      }
+      return 0.0;
+    }).toList();
+
+    if (positions.isNotEmpty) {
+      state = state.copyWith(
+        positions: positions,
+        draggablePosition: positions[state.currentIndex],
+      );
+    }
+  }
+
   void setCurrentIndex(int index) {
     if (state.positions.isEmpty) return;
+
     pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
+
     state = state.copyWith(
       currentIndex: index,
       draggablePosition: state.positions[index],
     );
   }
 
-  /// Update draggable position
-  void setDraggablePosition(double position) {
-    state = state.copyWith(draggablePosition: position);
-  }
-
-  /// Update drag offset
   void setDragOffset(double offset) {
     state = state.copyWith(dragOffset: offset);
   }
 
-  /// Reset drag offset
+  void setDraggablePosition(double position) {
+    state = state.copyWith(draggablePosition: position);
+  }
+
   void resetDragOffset() {
-    state = state.copyWith(dragOffset: 0.0);
+    state = state.copyWith(dragOffset: 0);
   }
 }
 
-/// Provider
 final navbarStateProvider =
-    StateNotifierProvider<NavbarStateNotifier, NavbarState>((ref) {
-      return NavbarStateNotifier();
-    });
+    StateNotifierProvider<NavbarStateNotifier, NavbarState>(
+      (ref) => NavbarStateNotifier(),
+    );
