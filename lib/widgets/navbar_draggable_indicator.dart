@@ -27,7 +27,7 @@ class NavbarDraggableIndicator extends StatelessWidget {
     final screenWidth = 1.sw;
 
     // Adaptive width based on item count, never smaller than 60.w
-    final adaptiveWidth = (baseSize * (3 / itemCount).clamp(0.7, 1.0)).w;
+    final adaptiveWidth = (baseSize * (3.5 / itemCount).clamp(1, 1.2)).w;
 
     // Clamp the center so indicator never goes off-screen
     final clampedCenter = position.clamp(
