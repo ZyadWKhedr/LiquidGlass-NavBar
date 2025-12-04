@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
-/// Provider for the current selected navbar index
-final currentIndexProvider = StateProvider<int>((ref) => 0);
-
-/// Provider for the draggable indicator's X position
-final draggablePositionProvider = StateProvider<double>((ref) => 0.0);
-
-/// Provider for the drag offset used in page transitions
-final dragOffsetProvider = StateProvider<double>((ref) => 0.0);
+/// Provider for the NavbarStateNotifier
+final navbarStateProvider =
+    StateNotifierProvider<NavbarStateNotifier, NavbarState>((ref) {
+      return NavbarStateNotifier();
+    });
 
 /// Navbar state class to hold all navbar-related state
-
 class NavbarState {
   final int currentIndex;
   final double draggablePosition;
@@ -36,6 +32,7 @@ class NavbarState {
   }
 }
 
+/// StateNotifier for managing Navbar state and PageController
 class NavbarStateNotifier extends StateNotifier<NavbarState> {
   NavbarStateNotifier()
     : super(
@@ -46,7 +43,14 @@ class NavbarStateNotifier extends StateNotifier<NavbarState> {
 
   late final PageController pageController;
 
-  /// Change page and update index
+  /// Dispose the page controller when notifier is disposed
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
+
+  /// Change page and update index with animation
   void setCurrentIndex(int index) {
     pageController.animateToPage(
       index,
@@ -61,17 +65,34 @@ class NavbarStateNotifier extends StateNotifier<NavbarState> {
     state = state.copyWith(draggablePosition: position);
   }
 
-  /// Update drag offset
-  void setDragOffset(double offset) {
-    state = state.copyWith(dragOffset: offset);
+  /// Update drag offset with friction (iOS-style)
+  void setDragOffset(double offset, {double friction = 0.32}) {
+    state = state.copyWith(dragOffset: offset * friction);
   }
 
+  /// Reset drag offset to zero
   void resetDragOffset() {
     state = state.copyWith(dragOffset: 0.0);
   }
-}
 
-final navbarStateProvider =
-    StateNotifierProvider<NavbarStateNotifier, NavbarState>((ref) {
-      return NavbarStateNotifier();
-    });
+  /// Handle drag release with momentum and snapping
+  void handleDragEnd({required double dragOffset, required int pageCount}) {
+    const snapThreshold = 85; // min drag to trigger page change
+    final currentIndex = state.currentIndex;
+
+    // Move to next page
+    if (dragOffset < -snapThreshold) {
+      if (currentIndex < pageCount - 1) {
+        setCurrentIndex(currentIndex + 1);
+      }
+    }
+    // Move to previous page
+    else if (dragOffset > snapThreshold) {
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+      }
+    }
+
+    resetDragOffset();
+  }
+}
