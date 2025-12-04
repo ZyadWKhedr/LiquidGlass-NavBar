@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 import 'navbar_item_widget.dart';
 import 'navbar_draggable_indicator.dart';
 import 'navbar_background.dart';
@@ -10,103 +9,84 @@ class NavbarWidget extends ConsumerWidget {
   final List<IconData> icons;
   final List<String> labels;
 
-  const NavbarWidget({super.key, required this.icons, required this.labels});
+  final double indicatorSize;
+  final double navbarHeight;
+  final double bottomPadding;
+  final double horizontalPadding;
+  final double dragMultiplier;
+  final double snapThreshold;
+
+  const NavbarWidget({
+    super.key,
+    required this.icons,
+    required this.labels,
+    this.indicatorSize = 75,
+    this.navbarHeight = 70,
+    this.bottomPadding = 30,
+    this.horizontalPadding = 20,
+    this.dragMultiplier = 0.3,
+    this.snapThreshold = 80,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navbarState = ref.watch(navbarStateProvider);
+    final notifier = ref.read(navbarStateProvider.notifier);
+
+    // Initialize positions once
+    if (navbarState.positions.isEmpty && icons.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final containerWidth = MediaQuery.of(context).size.width;
+        notifier.initPositions(
+          itemCount: icons.length,
+          containerWidth: containerWidth,
+          horizontalPadding: horizontalPadding,
+          indicatorSize: indicatorSize,
+        );
+      });
+    }
+
     final currentIndex = navbarState.currentIndex;
     final dragOffset = navbarState.draggablePosition;
+    final positions = navbarState.positions;
 
-    return LiquidGlassLayer(
-      useBackdropGroup: true,
-      settings: const LiquidGlassSettings(thickness: 20, blur: 1),
-      child: Center(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final rowWidth = constraints.maxWidth;
-            final itemCount = icons.length;
-            final navbarMargin = 20.0;
-            final availableWidth = rowWidth - (navbarMargin * 2);
-            final itemWidth = availableWidth / itemCount;
-
-            final positions = List.generate(
-              itemCount,
-              (i) =>
-                  navbarMargin +
-                  (i * itemWidth) +
-                  (itemWidth / 2) -
-                  (50 * 1.5 * 1.2 / 2),
-            );
-
-            // Initialize draggable position if not set
-            if (dragOffset == 0 && positions.isNotEmpty) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ref
-                    .read(navbarStateProvider.notifier)
-                    .setDraggablePosition(positions[currentIndex]);
-              });
-            }
-
-            return Stack(
-              alignment: Alignment.centerLeft,
-              children: [
-                // Navbar background with items
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                  ).copyWith(bottom: 30),
-                  child: NavbarBackground(
-                    width: rowWidth,
-                    height: 70,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: List.generate(itemCount, (index) {
-                        final isSelected = currentIndex == index;
-                        return NavbarItemWidget(
-                          icon: icons[index],
-                          label: labels[index],
-                          isSelected: isSelected,
-                          onTap: () {
-                            // Update provider state
-                            ref
-                                .read(navbarStateProvider.notifier)
-                                .setCurrentIndex(index);
-                            ref
-                                .read(navbarStateProvider.notifier)
-                                .setDraggablePosition(positions[index]);
-                          },
-                        );
-                      }),
-                    ),
-                  ),
-                ),
-
-                // Draggable indicator
-                NavbarDraggableIndicator(
-                  index: ref.read(navbarStateProvider).currentIndex,
-                  position: dragOffset,
-                  size: 50 * 1.5,
-                  snapPositions: positions,
-                  onDragUpdate: (newPosition) {
-                    ref
-                        .read(navbarStateProvider.notifier)
-                        .setDraggablePosition(newPosition);
-                  },
-                  onDragEnd: (newIndex) {
-                    ref
-                        .read(navbarStateProvider.notifier)
-                        .setCurrentIndex(newIndex);
-                    ref
-                        .read(navbarStateProvider.notifier)
-                        .setDraggablePosition(positions[newIndex]);
-                  },
-                ),
-              ],
-            );
-          },
+    return Stack(
+      alignment: Alignment.centerLeft,
+      children: [
+        // Background
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+          ).copyWith(bottom: bottomPadding),
+          child: NavbarBackground(
+            width: MediaQuery.of(context).size.width,
+            height: navbarHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(icons.length, (index) {
+                final isSelected = currentIndex == index;
+                return NavbarItemWidget(
+                  icon: icons[index],
+                  label: labels[index],
+                  isSelected: isSelected,
+                  onTap: () => notifier.setCurrentIndex(index),
+                );
+              }),
+            ),
+          ),
         ),
-      ),
+
+        // Draggable indicator
+        if (positions.isNotEmpty)
+          NavbarDraggableIndicator(
+            index: currentIndex,
+            position: dragOffset,
+            size: indicatorSize,
+            snapPositions: positions,
+            onDragUpdate: notifier.setDraggablePosition,
+            onDragEnd: notifier.setCurrentIndex,
+          ),
+      ],
     );
   }
 }

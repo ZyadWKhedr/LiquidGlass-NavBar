@@ -24,14 +24,17 @@ class NavbarBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LiquidGlass(
-      shape: LiquidRoundedSuperellipse(borderRadius: 30),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        width: width,
-        height: height,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
-        child: child,
+    return LiquidGlassLayer(
+      settings: const LiquidGlassSettings(thickness: 20, blur: 2),
+      child: LiquidGlass(
+        shape: LiquidRoundedSuperellipse(borderRadius: 30),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          width: width,
+          height: height,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
+          child: child,
+        ),
       ),
     );
   }

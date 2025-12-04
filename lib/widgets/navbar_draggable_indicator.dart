@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
-/// A draggable indicator widget for the navbar.
-///
-/// This widget displays a glassmorphic indicator that can be dragged
-/// horizontally and snaps to predefined positions.
 class NavbarDraggableIndicator extends StatelessWidget {
-  /// The current X position of the draggable indicator
   final double position;
-
-  /// The size of the draggable indicator
   final double size;
-
-  /// List of valid positions where the indicator can snap to
   final List<double> snapPositions;
-
-  /// Callback when the indicator is dragged
   final Function(double) onDragUpdate;
-
-  /// Callback when the drag ends
   final Function(int) onDragEnd;
-
   final int index;
+
+  /// Optional vertical offset
+  final double bottomOffset;
 
   const NavbarDraggableIndicator({
     super.key,
@@ -31,23 +20,23 @@ class NavbarDraggableIndicator extends StatelessWidget {
     required this.onDragUpdate,
     required this.onDragEnd,
     required this.index,
+    this.bottomOffset = 35,
   });
 
   @override
   Widget build(BuildContext context) {
+    double adjustedPosition = position;
+    // Optional fine-tuned offsets per index
+    if (index == 0) adjustedPosition += 16;
+    if (index == 1) adjustedPosition -= 3;
+    if (index == 2) adjustedPosition -= 16;
+
     return Positioned(
-      left: index == 0
-          ? position + 16
-          : index == 1
-          ? position - 3
-          : index == 2
-          ? position - 16
-          : position,
-      bottom: 35,
+      left: adjustedPosition,
+      bottom: bottomOffset,
       child: GestureDetector(
         onHorizontalDragUpdate: (details) {
           double newPosition = position + details.delta.dx;
-          // Clamp position to valid range
           newPosition = newPosition.clamp(
             snapPositions.first,
             snapPositions.last,
@@ -55,10 +44,8 @@ class NavbarDraggableIndicator extends StatelessWidget {
           onDragUpdate(newPosition);
         },
         onHorizontalDragEnd: (_) {
-          // Find nearest snap position
           double closest = snapPositions[0];
           double minDist = (position - snapPositions[0]).abs();
-
           for (double p in snapPositions) {
             double d = (position - p).abs();
             if (d < minDist) {
@@ -66,9 +53,7 @@ class NavbarDraggableIndicator extends StatelessWidget {
               closest = p;
             }
           }
-
-          final newIndex = snapPositions.indexOf(closest);
-          onDragEnd(newIndex);
+          onDragEnd(snapPositions.indexOf(closest));
         },
         child: LiquidGlassLayer(
           settings: const LiquidGlassSettings(

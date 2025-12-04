@@ -7,9 +7,9 @@ import 'package:liquid_glass_test/widgets/navbar_widget.dart';
 import 'package:liquid_glass_test/providers/navbar_providers.dart';
 
 class NavbarPage extends ConsumerWidget {
-  NavbarPage({super.key});
+  const NavbarPage({super.key});
 
-  final List<Widget> _pages = [HomePage(), SearchPage(), ProfilePage()];
+  final List<Widget> _pages = const [HomePage(), SearchPage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -24,7 +24,6 @@ class NavbarPage extends ConsumerWidget {
           // PAGE VIEW
           Transform.translate(
             offset: Offset(dragOffset * 0.25, 0),
-
             child: PageView(
               controller: notifier.pageController,
               physics: const NeverScrollableScrollPhysics(),
@@ -43,18 +42,19 @@ class NavbarPage extends ConsumerWidget {
 
                 // DRAG UPDATE
                 onHorizontalDragUpdate: (details) {
-                  final newOffset = dragOffset + details.delta.dx * 0.3;
-                  notifier.setDragOffset(newOffset);
+                  notifier.setDragOffset(dragOffset + details.delta.dx * 0.3);
                 },
 
                 // DRAG END
                 onHorizontalDragEnd: (_) {
                   if (dragOffset.abs() > 80) {
+                    // Determine swipe direction and jump pages
                     final jump = -(dragOffset / 80).round();
                     final newIndex = (currentIndex + jump).clamp(
                       0,
                       _pages.length - 1,
                     );
+
                     if (newIndex != currentIndex) {
                       notifier.setCurrentIndex(newIndex);
                     }
@@ -63,12 +63,12 @@ class NavbarPage extends ConsumerWidget {
                 },
 
                 child: NavbarWidget(
-                  icons: [
+                  icons: const [
                     Icons.home_rounded,
                     Icons.search_rounded,
                     Icons.person_rounded,
                   ],
-                  labels: ['Home', 'Search', 'Profile'],
+                  labels: const ['Home', 'Search', 'Profile'],
                 ),
               ),
             ),

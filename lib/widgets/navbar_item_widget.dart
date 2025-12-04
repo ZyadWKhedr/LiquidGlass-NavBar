@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
-/// A single navbar item widget with icon and label.
-///
-/// This widget represents an individual item in the navbar,
-/// displaying an icon and label with different styles based on selection state.
 class NavbarItemWidget extends StatelessWidget {
-  /// The icon to display for this navbar item
   final IconData icon;
-
-  /// The label text to display below the icon
   final String label;
-
-  /// Whether this item is currently selected
   final bool isSelected;
-
-  /// Callback when the item is tapped
   final VoidCallback onTap;
+
+  /// Optional customization
+  final double selectedIconSize;
+  final double unselectedIconSize;
+  final double selectedFontSize;
+  final double unselectedFontSize;
+  final Color selectedColor;
+  final Color unselectedColor;
+  final EdgeInsetsGeometry padding;
+  final EdgeInsetsGeometry margin;
 
   const NavbarItemWidget({
     super.key,
@@ -23,6 +22,14 @@ class NavbarItemWidget extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.selectedIconSize = 28,
+    this.unselectedIconSize = 24,
+    this.selectedFontSize = 12,
+    this.unselectedFontSize = 10,
+    this.selectedColor = Colors.amber,
+    this.unselectedColor = Colors.grey,
+    this.padding = const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+    this.margin = const EdgeInsets.symmetric(horizontal: 30),
   });
 
   @override
@@ -30,23 +37,23 @@ class NavbarItemWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        margin: const EdgeInsets.symmetric(horizontal: 30),
+        padding: padding,
+        margin: margin,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.amber : Colors.grey,
-              size: isSelected ? 28 : 24,
+              color: isSelected ? selectedColor : unselectedColor,
+              size: isSelected ? selectedIconSize : unselectedIconSize,
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.amber : Colors.grey,
-                fontSize: isSelected ? 12 : 10,
+                color: isSelected ? selectedColor : unselectedColor,
+                fontSize: isSelected ? selectedFontSize : unselectedFontSize,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
