@@ -26,6 +26,12 @@ https://github.com/user-attachments/assets/c083a53d-5b9f-4355-9b77-4a04e70198d3
 
 The navbar uses a sophisticated **two-stage position calculation** to ensure the draggable indicator aligns perfectly with each icon, regardless of how many items are in the navbar.
 
+
+
+https://github.com/user-attachments/assets/0b9f9fe8-984f-4dcd-8d5e-03624a1bfd24
+
+
+
 ### Stage 1: Initial Positions (Fast Approximation)
 
 When the navbar is first rendered, it calculates approximate positions for immediate display:

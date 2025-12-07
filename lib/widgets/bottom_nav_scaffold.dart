@@ -91,6 +91,7 @@ class _BottomNavScaffoldState extends ConsumerState<BottomNavScaffold> {
                   indicatorWidth: widget.indicatorWidth,
                   navbarHeight: widget.navbarHeight,
                   bottomPadding: widget.bottomPadding,
+                  horizontalPadding: widget.horizontalPadding,
                 ),
               ),
             ),

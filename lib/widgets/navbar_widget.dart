@@ -12,6 +12,7 @@ class NavbarWidget extends ConsumerWidget {
   final double indicatorWidth;
   final double navbarHeight;
   final double bottomPadding;
+  final double horizontalPadding;
 
   const NavbarWidget({
     super.key,
@@ -20,6 +21,7 @@ class NavbarWidget extends ConsumerWidget {
     this.indicatorWidth = 70,
     this.navbarHeight = 70,
     this.bottomPadding = 20,
+    this.horizontalPadding = 20,
   });
 
   @override
@@ -59,21 +61,24 @@ class NavbarWidget extends ConsumerWidget {
             left: 0,
             right: 0,
             bottom: bottomPadding.h,
-            child: NavbarBackground(
-              width: screenWidth,
-              height: navbarHeight.h,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(itemCount, (i) {
-                  return NavbarItemWidget(
-                    key: iconKeys[i],
-                    icon: icons[i],
-                    label: labels[i],
-                    isSelected: i == currentIndex,
-                    onTap: () => notifier.setCurrentIndex(i),
-                    padding: EdgeInsets.symmetric(vertical: 6.h),
-                  );
-                }),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding.w),
+              child: NavbarBackground(
+                width: screenWidth,
+                height: navbarHeight.h,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(itemCount, (i) {
+                    return NavbarItemWidget(
+                      key: iconKeys[i],
+                      icon: icons[i],
+                      label: labels[i],
+                      isSelected: i == currentIndex,
+                      onTap: () => notifier.setCurrentIndex(i),
+                      padding: EdgeInsets.symmetric(vertical: 6.h),
+                    );
+                  }),
+                ),
               ),
             ),
           ),

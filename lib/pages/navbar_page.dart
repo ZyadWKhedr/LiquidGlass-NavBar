@@ -14,23 +14,24 @@ class NavbarPage extends StatelessWidget {
         HomePage(),
         SearchPage(),
         ProfilePage(),
-        SizedBox(),
+        // SizedBox(),
       ],
       icons: const [
         Icons.home_rounded,
         Icons.search_rounded,
         Icons.person_rounded,
-        Icons.settings_rounded,
+        // Icons.settings_rounded,
       ],
       labels: const [
         'Home',
         'Search',
         'Profile',
-        'Settings',
+        // 'Settings',
       ],
       navbarHeight: 70,
       indicatorWidth: 70,
       bottomPadding: 20,
+      horizontalPadding: 15,
     );
   }
 }
