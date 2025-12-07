@@ -17,9 +17,9 @@ class NavbarPage extends StatelessWidget {
         // SizedBox(),
       ],
       icons: const [
-        Icons.home_rounded,
-        Icons.search_rounded,
-        Icons.person_rounded,
+        Icon(Icons.import_contacts),
+        Icon(Icons.search_rounded),
+        Icon(Icons.person_rounded),
         // Icons.settings_rounded,
       ],
       labels: const [
@@ -32,6 +32,8 @@ class NavbarPage extends StatelessWidget {
       indicatorWidth: 70,
       bottomPadding: 20,
       horizontalPadding: 15,
+      selectedColor: Colors.green,
+      unselectedColor: Colors.white,
     );
   }
 }

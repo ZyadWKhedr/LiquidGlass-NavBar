@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class BottomNavScaffold extends ConsumerStatefulWidget {
   final List<Widget> pages;
-  final List<IconData> icons;
+  final List<Widget> icons;
   final List<String> labels;
 
   // Optional styling
@@ -88,6 +88,8 @@ class _BottomNavScaffoldState extends ConsumerState<BottomNavScaffold> {
                 child: NavbarWidget(
                   icons: widget.icons,
                   labels: widget.labels,
+                  selectedColor: widget.selectedColor,
+                  unselectedColor: widget.unselectedColor,
                   indicatorWidth: widget.indicatorWidth,
                   navbarHeight: widget.navbarHeight,
                   bottomPadding: widget.bottomPadding,

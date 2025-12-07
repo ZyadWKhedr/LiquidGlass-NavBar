@@ -7,12 +7,14 @@ import 'navbar_background.dart';
 import '../providers/navbar_providers.dart';
 
 class NavbarWidget extends ConsumerWidget {
-  final List<IconData> icons;
+  final List<Widget> icons;
   final List<String> labels;
   final double indicatorWidth;
   final double navbarHeight;
   final double bottomPadding;
   final double horizontalPadding;
+  final Color selectedColor;
+  final Color unselectedColor;
 
   const NavbarWidget({
     super.key,
@@ -22,6 +24,8 @@ class NavbarWidget extends ConsumerWidget {
     this.navbarHeight = 70,
     this.bottomPadding = 20,
     this.horizontalPadding = 20,
+    this.selectedColor = Colors.amber,
+    this.unselectedColor = Colors.grey,
   });
 
   @override
@@ -70,6 +74,8 @@ class NavbarWidget extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: List.generate(itemCount, (i) {
                     return NavbarItemWidget(
+                      selectedColor: selectedColor,
+                      unselectedColor: unselectedColor,
                       key: iconKeys[i],
                       icon: icons[i],
                       label: labels[i],
